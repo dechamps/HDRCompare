@@ -1,1 +1,6 @@
+# This is a ffmpeg filtergraph: https://ffmpeg.org/ffmpeg-filters.html
+#
+# Note that the usual filtergraph "language" doesn't support comments. Lines
+# beginning with "#", such as these, need to be filtered out before parsing.
+
 [vid1] [vid2] vstack [vo]
