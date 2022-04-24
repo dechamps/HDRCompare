@@ -4,7 +4,7 @@ Example Powershell [mpv][] command line:
 
 ```powershell
 mpv `
-    --lavfi-complex="$((Get-Content -Path .\hdr-compare.lavfi) -notlike '#*')" `
+    --lavfi-complex="$((Get-Content -Path .\hdr-compare.lavfi) -notmatch '^\s*#')" `
     --vf=format=colormatrix=bt.2020-ncl:colorlevels=limited:primaries=bt.2020:gamma=pq `
     <PATH TO HDR FILE> --external-file=<PATH TO SDR FILE>
 ```

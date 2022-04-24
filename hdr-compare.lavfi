@@ -7,17 +7,17 @@
 [vid2] null@rename_sdr [sdr_original];
 
 [hdr_original]
-# We assume the SDR source is 1080p (as they often are). The HDR source will
-# likely be larger (typically UHD). We scale down the HDR source so that the
-# comparison is fair and focuses on colour differences only.
-#
-# TODO: the downscaling might dim very small, sharp highlights (e.g. stars
-# in a dark sky) due to local averaging, which is unfair to the HDR side.
-# Investigate if this is a problem with the default downscaler and if so,
-# use a sharper one.
+    # We assume the SDR source is 1080p (as they often are). The HDR source will
+    # likely be larger (typically UHD). We scale down the HDR source so that the
+    # comparison is fair and focuses on colour differences only.
+    #
+    # TODO: the downscaling might dim very small, sharp highlights (e.g. stars
+    # in a dark sky) due to local averaging, which is unfair to the HDR side.
+    # Investigate if this is a problem with the default downscaler and if so,
+    # use a sharper one.
     scale@scale_hdr = size=hd1080,
 
-# Force `scale` to preserve 10-bit bit depth; it outputs 8-bit otherwise.
+    # Force `scale` to preserve 10-bit bit depth; it outputs 8-bit otherwise.
     format@scale_hdr_preserve_10bit = yuv420p10le
 [hdr_scaled];
 
