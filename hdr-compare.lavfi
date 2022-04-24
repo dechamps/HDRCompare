@@ -15,4 +15,7 @@
 # if this is a problem with the default downscaler and if so, use a sharper one.
 [hdr_original] scale=size=hd1080 [hdr_scaled];
 
-[hdr_scaled] [sdr_original] vstack [vo]
+[hdr_scaled] crop=out_w=in_w/2:x=0 [hdr_cropped];
+[sdr_original] crop=out_w=in_w/2:x=in_w/2 [sdr_cropped];
+
+[hdr_cropped] [sdr_cropped] hstack [vo]
