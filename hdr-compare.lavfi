@@ -15,7 +15,17 @@
 # if this is a problem with the default downscaler and if so, use a sharper one.
 [hdr_original] scale = size=hd1080 [hdr_scaled];
 
+[hdr_scaled]
+    drawtext = text=HDR : fontfile=c:/windows/fonts/arial.ttf : x=(1/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black,
+    drawtext = text=HDR : fontfile=c:/windows/fonts/arial.ttf : x=(3/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black
+[hdr_labelled];
+
+[sdr_original]
+    drawtext = text=SDR : fontfile=c:/windows/fonts/arial.ttf : x=(1/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black,
+    drawtext = text=SDR : fontfile=c:/windows/fonts/arial.ttf : x=(3/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black
+[sdr_labelled];
+
 # On even seconds, display the left side of SDR on the left; on odd seconds,
 # display the right side of SDR on the right.
-[sdr_original] crop = out_w=in_w/2 : x='mod(floor(t),2)*(in_w/2)' [sdr_cropped];
-[hdr_scaled] [sdr_cropped] overlay = x='mod(floor(t),2)*overlay_w' [vo]
+[sdr_labelled] crop = out_w=in_w/2 : x='mod(floor(t),2)*(in_w/2)' [sdr_cropped];
+[hdr_labelled] [sdr_cropped] overlay = x='mod(floor(t),2)*overlay_w' [vo]
