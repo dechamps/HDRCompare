@@ -35,16 +35,23 @@
 # side.
 [sdr_labelled] crop@crop_sdr = out_w=in_w/2 : x='mod(floor(t),2)*(in_w/2)' [sdr_cropped];
 
-# Convert the SDR video to HDR10 (as is - no expansion).
-#
-# `npl` is the luminance that 100% SDR white will be mapped to and determines
-# the overall brightness of the SDR side.
-#
-# TODO: zimg explicitly states that it is not a "color management system" and
-# should not be used for "drastic" gamut changes, so the accuracy of this
-# transform is unlikely to be good. Unfortunately it doesn't look like we have
-# any other choice, aside from perhaps generating our own LUTs on the side.
-[sdr_cropped] zscale@convert_sdr_to_hdr10 = npl=150 : primaries=2020 : transfer=smpte2084 : matrix=2020_ncl [sdr_cropped_hdr10];
+
+[sdr_cropped]
+    # Convert the SDR video to HDR10 (as is - no expansion).
+    #
+    # `npl` is the luminance that 100% SDR white will be mapped to and
+    # determines the overall brightness of the SDR side.
+    #
+    # TODO: zimg explicitly states that it is not a "color management system"
+    # and should not be used for "drastic" gamut changes, so the accuracy of
+    # this transform is unlikely to be good. Unfortunately it doesn't look like
+    # we have any other choice, aside from perhaps generating our own LUTs on
+    # the side.
+    zscale@convert_sdr_to_hdr10 = npl=150 : primaries=2020 : transfer=smpte2084 : matrix=2020_ncl,
+
+    # Force `zscale` to output 10-bit to avoid banding during the conversion.
+    format@sdr_hdr10_force_10bit = yuv420p10le
+[sdr_cropped_hdr10];
 
 # On even seconds, `sdr_cropped` is the left side so display it on the left; on
 # off seconds, `sdr_cropped` is the right side so display it on the right.
