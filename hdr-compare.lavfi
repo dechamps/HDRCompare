@@ -25,7 +25,21 @@
     drawtext = text=SDR : fontfile=c:/windows/fonts/arial.ttf : x=(3/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black
 [sdr_labelled];
 
-# On even seconds, display the left side of SDR on the left; on odd seconds,
-# display the right side of SDR on the right.
+# On even seconds, keep the left side of SDR; on odd seconds, keep the right
+# side.
 [sdr_labelled] crop = out_w=in_w/2 : x='mod(floor(t),2)*(in_w/2)' [sdr_cropped];
-[hdr_labelled] [sdr_cropped] overlay = x='mod(floor(t),2)*overlay_w' [vo]
+
+# Convert the SDR video to HDR10 (as is - no expansion).
+#
+# `npl` is the luminance that 100% SDR white will be mapped to and determines
+# the overall brightness of the SDR side.
+#
+# TODO: zimg explicitly states that it is not a "color management system" and
+# should not be used for "drastic" gamut changes, so the accuracy of this
+# transform is unlikely to be good. Unfortunately it doesn't look like we have
+# any other choice, aside from perhaps generating our own LUTs on the side.
+[sdr_cropped] zscale = npl=150 : primaries=2020 : transfer=smpte2084 : matrix=2020_ncl [sdr_cropped_hdr10];
+
+# On even seconds, `sdr_cropped` is the left side so display it on the left; on
+# off seconds, `sdr_cropped` is the right side so display it on the right.
+[hdr_labelled] [sdr_cropped_hdr10] overlay = x='mod(floor(t),2)*overlay_w' [vo]
