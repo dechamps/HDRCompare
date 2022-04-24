@@ -6,4 +6,13 @@
 [vid1] null [hdr_original];
 [vid2] null [sdr_original];
 
-[hdr_original] [sdr_original] vstack [vo]
+# We assume the SDR source is 1080p (as they often are). The HDR source will
+# likely be larger (typically UHD). We scale down the HDR source so that the
+# comparison is fair and focuses on colour differences only.
+#
+# TODO: the downscaling might dim very small, sharp highlights (e.g. stars in a
+# dark sky) due to local averaging, which is unfair to the HDR side. Investigate
+# if this is a problem with the default downscaler and if so, use a sharper one.
+[hdr_original] scale=size=hd1080 [hdr_scaled];
+
+[hdr_scaled] [sdr_original] vstack [vo]
