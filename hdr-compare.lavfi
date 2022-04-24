@@ -6,14 +6,20 @@
 [vid1] null@rename_hdr [hdr_original];
 [vid2] null@rename_sdr [sdr_original];
 
+[hdr_original]
 # We assume the SDR source is 1080p (as they often are). The HDR source will
 # likely be larger (typically UHD). We scale down the HDR source so that the
 # comparison is fair and focuses on colour differences only.
 #
-# TODO: the downscaling might dim very small, sharp highlights (e.g. stars in a
-# dark sky) due to local averaging, which is unfair to the HDR side. Investigate
-# if this is a problem with the default downscaler and if so, use a sharper one.
-[hdr_original] scale@scale_hdr = size=hd1080 [hdr_scaled];
+# TODO: the downscaling might dim very small, sharp highlights (e.g. stars
+# in a dark sky) due to local averaging, which is unfair to the HDR side.
+# Investigate if this is a problem with the default downscaler and if so,
+# use a sharper one.
+    scale@scale_hdr = size=hd1080,
+
+# Force `scale` to preserve 10-bit bit depth; it outputs 8-bit otherwise.
+    format@scale_hdr_preserve_10bit = yuv420p10le
+[hdr_scaled];
 
 [hdr_scaled]
     drawtext@text_hdr_left = text=HDR : fontfile=c:/windows/fonts/arial.ttf : x=(1/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black,
