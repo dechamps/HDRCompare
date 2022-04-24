@@ -55,4 +55,4 @@
 
 # On even seconds, `sdr_cropped` is the left side so display it on the left; on
 # off seconds, `sdr_cropped` is the right side so display it on the right.
-[hdr_labelled] [sdr_cropped_hdr10] overlay@overlay = x='mod(floor(t),2)*overlay_w' [vo]
+[hdr_labelled] [sdr_cropped_hdr10] overlay@overlay = x='mod(floor(t),2)*overlay_w' : format=yuv420p10 [vo]
