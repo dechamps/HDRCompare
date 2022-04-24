@@ -35,7 +35,6 @@
 # side.
 [sdr_labelled] crop@crop_sdr = out_w=in_w/2 : x='mod(floor(t),2)*(in_w/2)' [sdr_cropped];
 
-
 [sdr_cropped]
     # Convert the SDR video to HDR10 (as is - no expansion).
     #
