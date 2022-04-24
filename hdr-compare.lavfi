@@ -13,7 +13,7 @@
 # TODO: the downscaling might dim very small, sharp highlights (e.g. stars in a
 # dark sky) due to local averaging, which is unfair to the HDR side. Investigate
 # if this is a problem with the default downscaler and if so, use a sharper one.
-[hdr_original] scale=size=hd1080 [hdr_scaled];
+[hdr_original] scale = size=hd1080 [hdr_scaled];
 
 [hdr_scaled] crop=out_w=in_w/2:x=0 [hdr_cropped];
 [sdr_original] crop=out_w=in_w/2:x=in_w/2 [sdr_cropped];
