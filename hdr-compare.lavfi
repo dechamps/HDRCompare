@@ -50,6 +50,10 @@
     zscale@convert_sdr_to_hdr10 = npl=150 : primaries=2020 : transfer=smpte2084 : matrix=2020_ncl,
 
     # Force `zscale` to output 10-bit to avoid banding during the conversion.
+    #
+    # TODO: ideally we should use `yuva420p10le` here to avoid an automatic
+    # conversion on the input of `overlay`. But if we do, it seems to trigger
+    # a weird image corruption bug. Investigate.
     format@sdr_hdr10_force_10bit = yuv420p10le
 [sdr_cropped_hdr10];
 
