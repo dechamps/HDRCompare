@@ -1,6 +1,11 @@
 # HDRCompare: compare SDR and HDR video files
 *Brought to you by [Etienne Dechamps][] - [GitHub][]*
 
+<a href="The-Expanse-S06E04-2941-compare.jpg"><img src="The-Expanse-S06E04-2941-compare.jpg" width="500"></a>
+<a href="The-Expanse-S06E04-3053-compare.jpg"><img src="The-Expanse-S06E04-3053-compare.jpg" width="500"></a>
+<a href="The-Expanse-S06E04-0036-diff.jpg"><img src="The-Expanse-S06E04-0036-diff.jpg" width="500"></a>
+<a href="The-Expanse-S06E04-0839-diff.jpg"><img src="The-Expanse-S06E04-0839-diff.jpg" width="500"></a>
+
 ## Description
 
 HDRCompare is a suite of [ffmpeg/libavfilter filters][lavfi] for comparing
