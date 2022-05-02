@@ -34,9 +34,9 @@ differences.
 ## Limitations
 
 - This is a quickly-thrown-together toy, not a tool designed for serious use. Do
-  not expect it to be accurate. In particular, no effort was spent adjusting
-  various parameters. The SDR to HDR colorspace conversion, in particular, is
-  dubious at best.
+  not expect it to be accurate. No effort was spent fine-tuning various
+  parameters. The SDR to HDR colorspace conversion, in particular, is dubious at
+  best.
   - A more serious attempt would use a proper CMS to do the gamut mapping from
     SDR to HDR, and would likely leverage a DeltaE formula or similar to
     highlight the differences in a perceptually accurate manner.
