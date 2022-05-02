@@ -1,0 +1,54 @@
+# This is a ffmpeg filtergraph: https://ffmpeg.org/ffmpeg-filters.html
+#
+# Note that the usual filtergraph "language" doesn't support comments. Lines
+# beginning with "#", such as these, need to be filtered out before parsing.
+
+[vid1] null@rename_hdr [hdr_original];
+[vid2] null@rename_sdr [sdr_original];
+
+[hdr_original]
+    scale@scale_hdr = size=hd1080,
+    # Force `scale` to preserve 10-bit bit depth; it outputs 8-bit otherwise.
+    format@scale_hdr_preserve_10bit = yuv420p10
+[hdr_scaled];
+
+[sdr_original]
+    scale@scale_sdr = size=hd1080,
+    format@scale_sdr_preserve_10bit = yuv420p10
+[sdr_scaled];
+
+[sdr_scaled]
+    # Convert the SDR video to HDR10 (as is - no expansion).
+    #
+    # `npl` is the luminance that 100% SDR white will be mapped to and
+    # determines the overall brightness of the SDR side.
+    #
+    # TODO: zimg explicitly states that it is not a "color management system"
+    # and should not be used for "drastic" gamut changes, so the accuracy of
+    # this transform is unlikely to be good. Unfortunately it doesn't look like
+    # we have any other choice, aside from perhaps generating our own LUTs on
+    # the side.
+    zscale@convert_sdr_to_hdr10 = npl=150 : primaries=2020 : transfer=smpte2084 : matrix=2020_ncl,
+
+    # Force `zscale` to output 10-bit to avoid banding during the conversion.
+    format@sdr_hdr10_force_10bit = yuv420p10
+[sdr_scaled_hdr10];
+
+[hdr_scaled] split@split_hdr [hdr_scaled_monitor] [hdr_scaled_blend];
+[sdr_scaled_hdr10] split@split_sdr [sdr_scaled_hdr10_monitor] [sdr_scaled_hdr10_blend];
+
+[hdr_scaled_monitor] [sdr_scaled_hdr10_monitor] vstack@stack_hdr_sdr [hdr_sdr];
+
+[hdr_scaled_blend] [sdr_scaled_hdr10_blend]
+    # TODO: this only considers luminance. It would be nice to see differences
+    # in saturation as well.
+    # TODO: this will also show pixels where SDR>HDR, which is arguably
+    # confusing.
+    blend@diff_hdr_sdr = c0_mode=difference : c1_mode=average : c2_mode=average,
+
+    # Make the differences more obvious.
+    lut@brighten_diff = y=val*2
+[diff];
+
+[diff] pad@pad_diff = height=in_h*2 : y=in_h/2 [diff_padded];
+[hdr_sdr] [diff_padded] hstack@stack_columns [vo]
