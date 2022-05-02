@@ -34,21 +34,47 @@
     format@sdr_hdr10_force_10bit = yuv420p10
 [sdr_scaled_hdr10];
 
-[hdr_scaled] split@split_hdr [hdr_scaled_monitor] [hdr_scaled_blend];
-[sdr_scaled_hdr10] split@split_sdr [sdr_scaled_hdr10_monitor] [sdr_scaled_hdr10_blend];
+[hdr_scaled] split@split_hdr [hdr_scaled_planes] [hdr_scaled_monitor];
+[sdr_scaled_hdr10] split@split_sdr [sdr_scaled_hdr10_planes] [sdr_scaled_hdr10_monitor];
+[hdr_scaled_planes] extractplanes@extractplanes_hdr = y+u+v [hdr_scaled_y] [hdr_scaled_u] [hdr_scaled_v];
+[sdr_scaled_hdr10_planes] extractplanes@extractplanes_sdr = y+u+v [sdr_scaled_y] [sdr_scaled_u] [sdr_scaled_v];
+[hdr_scaled_y] split@split_hdr_y [hdr_scaled_y1] [hdr_scaled_y2];
 
-[hdr_scaled_monitor] [sdr_scaled_hdr10_monitor] vstack@stack_hdr_sdr [hdr_sdr];
+[hdr_scaled_y1] [sdr_scaled_y]
+    blend@diff_y = subtract,
 
-[hdr_scaled_blend] [sdr_scaled_hdr10_blend]
-    # TODO: this only considers luminance. It would be nice to see differences
-    # in saturation as well.
-    # TODO: this will also show pixels where SDR>HDR, which is arguably
-    # confusing.
-    blend@diff_hdr_sdr = c0_mode=subtract : c1_mode=average : c2_mode=average,
+    # Make the luma difference more obvious.
+    lut@brighten_diff_y = y=val*2
+[diff_y];
 
-    # Make the differences more obvious.
-    lut@brighten_diff = y=val*2
-[diff];
+# Generate a saturation stream from the two chroma planes.
+# This is done by calculating the 2D distance to the UV center point (i.e.
+# white).
+# TODO: this is likely overly naive from a perceptual perspective.
+# We then apply a multiplicative factor to make better use of the available
+# dynamic range. TODO: it might be simpler (and certainly more accurate!) to use
+# a floating point pixel format.
+[hdr_scaled_u] [hdr_scaled_v] lut2@saturation_hdr = c0=(sqrt((x-2^(bdx-1))^2+(y-2^(bdy-1))^2))*10 [hdr_scaled_saturation];
+[sdr_scaled_u] [sdr_scaled_v] lut2@saturation_sdr = c0=(sqrt((x-2^(bdx-1))^2+(y-2^(bdy-1))^2))*10 [sdr_scaled_saturation];
+[hdr_scaled_saturation] [sdr_scaled_saturation]
+    blend@diff_saturation = subtract,
 
-[diff] pad@pad_diff = height=in_h*2 : y=in_h/2 [diff_padded];
-[hdr_sdr] [diff_padded] hstack@stack_columns [vo]
+    # Make the saturation difference more obvious.
+    lut@brighten_diff_saturation = y=val*20,
+
+    # The saturation stream has the same size as chroma planes, which are
+    # smaller than the video. Scale it back.
+    scale@scale_diff_saturation = size=hd1080,
+    format@scale_diff_saturation_format = yuv420p10
+[diff_saturation];
+# Scale the saturation difference using HDR luma. This emphasizes saturation
+# differences in bright pixels (more noticeable) while avoiding noise caused by
+# differences in dark pixels (not noticeable).
+# TODO: once again this is perceptually dubious. At the end of the day, what
+# would be ideal would be to simply compute the color dE for every pixel...
+[hdr_scaled_y2] lut@brighten_hdr_for_sat = y=val/4 [hdr_scaled_y2_adjusted];
+[diff_saturation] [hdr_scaled_y2_adjusted] blend@adjust_saturation = multiply [diff_saturation_adjusted];
+
+[hdr_scaled_monitor] [sdr_scaled_hdr10_monitor] vstack@stack_monitor_column [monitor_column];
+[diff_y] [diff_saturation_adjusted] vstack@stack_diff_column [diff_column];
+[monitor_column] [diff_column] hstack@stack_columns [vo]
