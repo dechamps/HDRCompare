@@ -80,5 +80,5 @@ even different scenes of a single movie might call for a different value.
 [Etienne Dechamps]: mailto:etienne@edechamps.fr
 [GitHub]: https://github.com/dechamps/HDRCompare
 [lavfi]: https://ffmpeg.org/ffmpeg-filters.html
-[mpv]: https://mpv.io/manual/master/#miscellaneous
+[mpv]: https://mpv.io/
 [mpv10129]: https://github.com/mpv-player/mpv/issues/10129
