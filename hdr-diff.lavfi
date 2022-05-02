@@ -44,7 +44,7 @@
     # in saturation as well.
     # TODO: this will also show pixels where SDR>HDR, which is arguably
     # confusing.
-    blend@diff_hdr_sdr = c0_mode=difference : c1_mode=average : c2_mode=average,
+    blend@diff_hdr_sdr = c0_mode=subtract : c1_mode=average : c2_mode=average,
 
     # Make the differences more obvious.
     lut@brighten_diff = y=val*2
