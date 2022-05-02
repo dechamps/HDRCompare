@@ -7,14 +7,21 @@
 [vid2] null@rename_sdr [sdr_original];
 
 [hdr_original]
-    scale@scale_hdr = size=hd1080,
+    scale@scale_hdr = width=1920:height=-1,
     # Force `scale` to preserve 10-bit bit depth; it outputs 8-bit otherwise.
-    format@scale_hdr_preserve_10bit = yuv420p10
-[hdr_scaled];
+    format@scale_hdr_preserve_10bit = yuv420p10,
 
+    # Handle weird heights by adding black bars so that the output is a
+    # predicable, fixed size.
+    pad@pad_hdr = height=1080:y=in_h/2
+[hdr_scaled];
 [sdr_original]
-    scale@scale_sdr = size=hd1080,
-    format@scale_sdr_preserve_10bit = yuv420p10
+    # This is expected to be a no-op since the SDR input is likely already
+    # 1080p, but let's make sure of it.
+    scale@scale_sdr = width=1920:height=-1,
+    format@scale_sdr_preserve_10bit = yuv420p10,
+
+    pad@pad_sdr = height=1080:y=in_h/2
 [sdr_scaled];
 
 [sdr_scaled]

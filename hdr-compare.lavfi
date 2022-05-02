@@ -15,18 +15,30 @@
     # in a dark sky) due to local averaging, which is unfair to the HDR side.
     # Investigate if this is a problem with the default downscaler and if so,
     # use a sharper one.
-    scale@scale_hdr = size=hd1080,
+    scale@scale_hdr = width=1920:height=-1,
 
     # Force `scale` to preserve 10-bit bit depth; it outputs 8-bit otherwise.
-    format@scale_hdr_preserve_10bit = yuv420p10le
+    format@scale_hdr_preserve_10bit = yuv420p10le,
+
+    # Handle weird heights by adding black bars so that the output is a
+    # predicable, fixed size.
+    pad = height=1080:y=in_h/2
 [hdr_scaled];
+[sdr_original]
+    # This is expected to be a no-op since the SDR input is likely already
+    # 1080p, but let's make sure of it.
+    scale@scale_sdr = width=1920:height=-1,
+    format@scale_sdr_preserve_10bit = yuv420p10le,
+
+    pad@pad_sdr = height=1080:y=in_h/2
+[sdr_scaled];
 
 [hdr_scaled]
     drawtext@text_hdr_left = text=HDR : fontfile=c:/windows/fonts/arial.ttf : x=(1/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black,
     drawtext@text_hdr_right = text=HDR : fontfile=c:/windows/fonts/arial.ttf : x=(3/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black
 [hdr_labelled];
 
-[sdr_original]
+[sdr_scaled]
     drawtext@text_sdr_left = text=SDR : fontfile=c:/windows/fonts/arial.ttf : x=(1/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black,
     drawtext@text_sdr_right = text=SDR : fontfile=c:/windows/fonts/arial.ttf : x=(3/4)*main_w-text_w/2 : y=main_h-text_h : fontcolor=#888888 : box=1 : boxcolor=black
 [sdr_labelled];
